@@ -91,22 +91,20 @@ toPx x =
 
 view : Model -> Html Msg
 view model =
-  let
-    w = model.windowSize.width
-    h = model.windowSize.height
-  in
-    div
-      [ style [
-        ("width", toPx w),
-        ("height", toPx h),
-        ("position", "relative") ] ]
-      [ renderButtons model,
-        div
-          [ id "content", style [
-            ("width", toPx <| w - 120),
-            ("height", toPx <| h - 60),
-            ("top", "0px"),
-            ("left", "0px"),
-            ("position", "absolute"),
-            ("text-align", "center") ] ]
-          [ renderSlide model ] ]
+  div
+    [ style [
+      ("width", toPx model.windowSize.width),
+      ("height", toPx model.windowSize.height),
+      ("position", "relative") ] ]
+    [ renderButtons model,
+      div
+        [ id "content", style [
+          ("font-size", "1.2em"),
+          ("top", "0px"),
+          ("left", "0px"),
+          ("right", "100px"),
+          ("bottom", "40px"),
+          ("padding-top", "20px"),
+          ("padding-left", "40px"),
+          ("position", "absolute") ] ]
+        [ renderSlide model ] ]
