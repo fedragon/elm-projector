@@ -5,25 +5,35 @@ import Html.Attributes exposing (disabled, id, style)
 import Html.Events exposing (onClick)
 import Markdown
 import Maybe exposing (Maybe, withDefault)
+import Task
+import Window
 
 import Slides
 
 main =
-  App.beginnerProgram {
-    model = init,
+  App.program {
+    init = init,
     update = update,
+    subscriptions = subscriptions,
     view = view
   }
 
 type alias Model = {
+  windowSize : Window.Size,
   slides : Array(Html Msg),
   index : Int
 }
 
-type Msg = Previous | Next
+type Msg =
+  PreviousSlide
+  | NextSlide
+  | Idle
+  | Resize Window.Size
 
-init : Model
-init = Model (toHtml Slides.all) 0
+init : (Model, Cmd Msg)
+init =
+  (Model (Window.Size 0 0) (toHtml Slides.all) 0,
+    Task.perform (\_ -> Idle) (\x -> Resize x) Window.size)
 
 toHtml : List String -> Array (Html Msg)
 toHtml slides =
@@ -39,61 +49,64 @@ renderSlide model =
       model.index
       model.slides)
 
-update : Msg -> Model -> Model
+update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
   case msg of
-    Previous ->
-      { model | index = model.index - 1 }
-    Next ->
-      { model | index = model.index + 1 }
+    PreviousSlide ->
+      ({ model | index = model.index - 1 }, Cmd.none)
+    NextSlide ->
+      ({ model | index = model.index + 1 }, Cmd.none)
+    Resize newSize ->
+      ({ model | windowSize = newSize } , Cmd.none)
+    Idle ->
+      (model, Cmd.none)
 
-prevButton model =
-  button
-    [ onClick Previous,
-      disabled (model.index == 0) ]
-    [ text "<" ]
+subscriptions : Model -> Sub Msg
+subscriptions model =
+  Window.resizes Resize
 
-nextButton model =
-  button
-    [ onClick Next,
-      disabled (model.index == (Array.length model.slides - 1)) ]
-    [ text ">" ]
+renderButtons model =
+  div
+    [ id "buttons",
+      style [
+        ("width", "100px"),
+        ("height", "40px"),
+        ("bottom", "0px"),
+        ("right", "0px"),
+        ("padding-top", "20px"),
+        ("padding-left", "20px"),
+        ("position", "absolute") ] ]
+    [ button
+        [ onClick PreviousSlide,
+          disabled (model.index == 0) ]
+        [ text "<" ],
+      button
+        [ onClick NextSlide,
+          disabled (model.index == (Array.length model.slides - 1)) ]
+        [ text ">" ] ]
+
+toPx : Int -> String
+toPx x =
+  (toString x) ++ "px"
 
 view : Model -> Html Msg
 view model =
-  div
-    [ style [
-      ("width", "100%"),
-      ("height", "100%"),
-      ("position", "relative") ] ]
-    [ div [ id "left", style [
-        ("width", "20%"),
-        ("height", "100%"),
-        ("top", "0px"),
-        ("left", "0px"),
-        ("position", "absolute") ] ] [],
-      div
-        [ id "content", style [
-          ("width", "60%"),
-          ("height", "100%"),
-          ("top", "0px"),
-          ("left", "20%"),
-          ("position", "absolute"),
-          ("text-align", "center") ] ]
-        [ div
-            [ id "slide", style [
-              ("float", "left"),
-              ("width", "100%"),
-              ("height", "80%") ] ]
-            [ renderSlide model ],
-          div
-            [ id "buttons", style [("clear", "both") ] ]
-            [ prevButton model, nextButton model ]
-        ],
-      div [ id "right", style [
-        ("width", "20%"),
-        ("height", "100%"),
-        ("top", "0px"),
-        ("right", "0px"),
-        ("position", "absolute") ] ] []
-    ]
+  let
+    w = model.windowSize.width
+    h = model.windowSize.height
+  in
+    div
+      [ style [
+        ("width", toPx w),
+        ("height", toPx h),
+        ("position", "relative") ] ]
+      [ renderButtons model,
+        div
+          [ id "content", style [
+            ("width", toPx <| w - 120),
+            ("height", toPx <| h - 60),
+            ("top", "0px"),
+            ("left", "0px"),
+            ("position", "absolute"),
+            ("text-align", "center") ] ]
+          [ renderSlide model ] ]
