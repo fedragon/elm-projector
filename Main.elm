@@ -41,14 +41,6 @@ toHtml slides =
     (\s -> Markdown.toHtml [] s)
     (Array.fromList slides)
 
-renderSlide : Model -> Html Msg
-renderSlide model =
-  Maybe.withDefault
-    (Markdown.toHtml [] "# Slide not found")
-    (Array.get
-      model.index
-      model.slides)
-
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
   case msg of
@@ -85,20 +77,27 @@ renderButtons model =
           disabled (model.index == (Array.length model.slides - 1)) ]
         [ text ">" ] ]
 
-toPx : Int -> String
-toPx x =
-  (toString x) ++ "px"
+renderSlide : Model -> Html Msg
+renderSlide model =
+  Maybe.withDefault
+    (Markdown.toHtml [] "# Slide not found")
+    (Array.get
+      model.index
+      model.slides)
 
 view : Model -> Html Msg
 view model =
   div
     [ style [
-      ("width", toPx model.windowSize.width),
-      ("height", toPx model.windowSize.height),
+      ("width", (toString model.windowSize.width) ++ "px"),
+      ("height", (toString model.windowSize.height) ++ "px"),
+      ("background-color", "black"),
+      ("opacity", "0.85"),
+      ("font-family", "Source Sans Pro"),
       ("position", "relative") ] ]
     [ renderButtons model,
       div
-        [ id "content", style [
+        [ id "slide", style [
           ("font-size", "1.2em"),
           ("top", "0px"),
           ("left", "0px"),
@@ -106,5 +105,6 @@ view model =
           ("bottom", "40px"),
           ("padding-top", "20px"),
           ("padding-left", "40px"),
+          ("color", "white"),
           ("position", "absolute") ] ]
         [ renderSlide model ] ]
