@@ -1,7 +1,8 @@
 import Array exposing (Array, fromList, map)
+import Css
 import Html exposing (Html, button, div, text)
 import Html.App as App
-import Html.Attributes exposing (disabled, id, style)
+import Html.Attributes exposing (class, disabled, style)
 import Html.Events exposing (onClick)
 import Markdown
 import Maybe exposing (Maybe, withDefault)
@@ -59,15 +60,7 @@ subscriptions model =
 
 renderButtons model =
   div
-    [ id "buttons",
-      style [
-        ("width", "100px"),
-        ("height", "40px"),
-        ("bottom", "0px"),
-        ("right", "0px"),
-        ("padding-top", "20px"),
-        ("padding-left", "20px"),
-        ("position", "absolute") ] ]
+    [ class "buttons" ]
     [ button
         [ onClick PreviousSlide,
           disabled (model.index == 0) ]
@@ -87,24 +80,17 @@ renderSlide model =
 
 view : Model -> Html Msg
 view model =
-  div
-    [ style [
-      ("width", (toString model.windowSize.width) ++ "px"),
-      ("height", (toString model.windowSize.height) ++ "px"),
-      ("background-color", "black"),
-      ("opacity", "0.85"),
-      ("font-family", "Source Sans Pro"),
-      ("position", "relative") ] ]
-    [ renderButtons model,
-      div
-        [ id "slide", style [
-          ("font-size", "1.2em"),
-          ("top", "0px"),
-          ("left", "0px"),
-          ("right", "100px"),
-          ("bottom", "40px"),
-          ("padding-top", "20px"),
-          ("padding-left", "40px"),
-          ("color", "white"),
-          ("position", "absolute") ] ]
-        [ renderSlide model ] ]
+  let
+    imports = ["assets/main.css"]
+    stylesheet = Css.stylesheet imports []
+    width = (toString model.windowSize.width) ++ "px"
+    height = (toString model.windowSize.height) ++ "px"
+  in
+    div
+      [ class "container",
+        style [ ("width", width), ("height", height) ] ]
+      [ Css.style [ Html.Attributes.scoped True ] stylesheet,
+        renderButtons model,
+        div
+          [ class "slide" ]
+          [ renderSlide model ] ]

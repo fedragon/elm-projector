@@ -1,0 +1,28 @@
+.container {
+  background-color: black;
+  opacity: 0.85;
+  font-family: Source Sans Pro;
+  position: relative;
+}
+
+.slide {
+  font-size: 1.2em;
+  top: 0px;
+  left: 0px;
+  right: 100px;
+  bottom: 40px;
+  padding-top: 20px;
+  padding-left: 40px;
+  color: white;
+  position: absolute;
+}
+
+.buttons {
+  width: 100px;
+  height: 40px;
+  bottom: 0px;
+  right: 0px;
+  padding-top: 20px;
+  padding-left: 20px;
+  position: absolute;
+}
