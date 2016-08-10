@@ -75,11 +75,13 @@ renderButtons model =
 
 renderSlide : Model -> Html Msg
 renderSlide model =
-  Maybe.withDefault
-    (Markdown.toHtml [] "# Slide not found")
-    (Array.get
-      model.index
-      model.slides)
+  div
+    [ class "slide" ]
+    [ Maybe.withDefault
+        (Markdown.toHtml [] "# Slide not found")
+        (Array.get
+          model.index
+          model.slides) ]
 
 view : Model -> Html Msg
 view model =
@@ -94,6 +96,4 @@ view model =
         style [ ("width", width), ("height", height) ] ]
       [ Css.style [ Html.Attributes.scoped True ] stylesheet,
         renderButtons model,
-        div
-          [ class "slide" ]
-          [ renderSlide model ] ]
+        renderSlide model ]
