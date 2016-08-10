@@ -1,3 +1,9 @@
+th, td {
+  border: 1px solid white;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
 .container {
   background-color: black;
   opacity: 0.85;

@@ -4,7 +4,7 @@ import Html exposing (Html, button, div, text)
 import Html.App as App
 import Html.Attributes exposing (class, disabled, style)
 import Html.Events exposing (onClick)
-import Markdown
+import Markdown exposing (defaultOptions, toHtmlWith)
 import Maybe exposing (Maybe, withDefault)
 import Task
 import Window
@@ -39,7 +39,10 @@ init =
 toHtml : List String -> Array (Html Msg)
 toHtml slides =
   Array.map
-    (\s -> Markdown.toHtml [] s)
+    (\s ->
+      toHtmlWith
+        { defaultOptions | githubFlavored = Just { tables = True, breaks = False } }
+        [] s)
     (Array.fromList slides)
 
 update : Msg -> Model -> (Model, Cmd Msg)
