@@ -4,12 +4,12 @@ import Html exposing (Html, button, div, text)
 import Html.App as App
 import Html.Attributes exposing (class, disabled, style)
 import Html.Events exposing (onClick)
+import Http exposing (getString)
 import Markdown exposing (defaultOptions, toHtmlWith)
 import Maybe exposing (Maybe, withDefault)
+import String exposing (split)
 import Task
 import Window
-
-import Slides
 
 main =
   App.program {
@@ -26,36 +26,76 @@ type alias Model = {
 }
 
 type Msg =
-  PreviousSlide
+  SlidesNotFound
+  | GotSlides (Array(Html Msg))
+  | PreviousSlide
   | NextSlide
   | Idle
   | Resize Window.Size
 
 init : (Model, Cmd Msg)
 init =
-  (Model (Window.Size 0 0) (toHtml Slides.all) 0,
+  (Model (Window.Size 0 0) Array.empty 0,
     Task.perform (\_ -> Idle) (\x -> Resize x) Window.size)
 
-toHtml : List String -> Array (Html Msg)
-toHtml slides =
-  Array.map
-    (\s ->
-      toHtmlWith
-        { defaultOptions | githubFlavored = Just { tables = True, breaks = False } }
-        [] s)
-    (Array.fromList slides)
+parseR : List Int -> String -> Array(Html Msg) -> Array(Html Msg)
+parseR indexes slides acc =
+  case indexes of
+    [] -> Array.push (toHtml slides) acc
+    hd :: tl ->
+      let
+        slide = String.left hd slides |> toHtml
+        remaining = String.dropLeft hd slides
+      in
+        parseR
+          tl
+          remaining
+          (Array.push slide acc)
+
+parse : String -> Array(Html Msg)
+parse raw =
+  case (String.indexes "# " raw) of
+    [] -> Array.empty
+    hd :: tl ->
+      let
+        slides = String.dropLeft hd raw
+      in
+        parseR
+          (String.indexes "# " slides |> List.drop 1)
+          slides
+          Array.empty
+
+getSlides : Cmd Msg
+getSlides =
+  Task.perform
+    (\_ -> SlidesNotFound)
+    (\s -> GotSlides s)
+    (Task.map
+      (\slides -> parse slides)
+      (Http.getString "/slides.md"))
+
+toHtml : String -> Html Msg
+toHtml s =
+  toHtmlWith
+    { defaultOptions | githubFlavored = Just { tables = True, breaks = False } }
+    []
+    s
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
   case msg of
+    SlidesNotFound ->
+      (model, Cmd.none)
+    GotSlides slides ->
+      ({ model | slides = slides}, Cmd.none)
     PreviousSlide ->
       ({ model | index = model.index - 1 }, Cmd.none)
     NextSlide ->
       ({ model | index = model.index + 1 }, Cmd.none)
     Resize newSize ->
-      ({ model | windowSize = newSize } , Cmd.none)
+      ({ model | windowSize = newSize }, getSlides)
     Idle ->
-      (model, Cmd.none)
+      (model, getSlides)
 
 subscriptions : Model -> Sub Msg
 subscriptions model =

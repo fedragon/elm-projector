@@ -4,25 +4,10 @@ Present Markdown slides as HTML. Built in [Elm](http://elm-lang.org). Heavily in
 
 ## Add your slides
 
-Slides are expected to be defined in `Slides.elm`.
-
-To add a slide:
-- create a multiline string that defines its contents, and
-- append the created string to `all`, in the intended position.
-
-Example:
-
-    firstSlide = """
-    # My first slide
-    """
-    secondSlide = """
-    # My second slide
-    """
-
-    all = [firstSlide, secondSlide]
+Slides are expected to be defined in `slides.md`: each slide must start with a **Heading 1** (e.g. `# First slide`).
 
 ## Run
 
-    elm reactor -a=localhost
+    elm-reactor
 
 then go to [http://localhost:8000/Main.elm](http://localhost:8000/Main.elm)
