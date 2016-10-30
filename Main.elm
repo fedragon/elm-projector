@@ -5,11 +5,12 @@ import Html.App as App
 import Html.Attributes exposing (class, disabled, style)
 import Html.Events exposing (onClick)
 import Http exposing (getString)
-import Markdown exposing (defaultOptions, toHtmlWith)
+import Markdown
 import Maybe exposing (Maybe, withDefault)
-import String exposing (split)
 import Task
 import Window
+
+import Slides
 
 main =
   App.program {
@@ -38,48 +39,14 @@ init =
   (Model (Window.Size 0 0) Array.empty 0,
     Task.perform (\_ -> Idle) (\x -> Resize x) Window.size)
 
-parseR : List Int -> String -> Array(Html Msg) -> Array(Html Msg)
-parseR indexes slides acc =
-  case indexes of
-    [] -> Array.push (toHtml slides) acc
-    hd :: tl ->
-      let
-        slide = String.left hd slides |> toHtml
-        remaining = String.dropLeft hd slides
-      in
-        parseR
-          tl
-          remaining
-          (Array.push slide acc)
-
-parse : String -> Array(Html Msg)
-parse raw =
-  case (String.indexes "# " raw) of
-    [] -> Array.empty
-    hd :: tl ->
-      let
-        slides = String.dropLeft hd raw
-      in
-        parseR
-          (String.indexes "# " slides |> List.drop 1)
-          slides
-          Array.empty
-
 getSlides : Cmd Msg
 getSlides =
   Task.perform
     (\_ -> SlidesNotFound)
     (\s -> GotSlides s)
     (Task.map
-      (\slides -> parse slides)
+      (\slides -> Slides.parse slides)
       (Http.getString "/slides.md"))
-
-toHtml : String -> Html Msg
-toHtml s =
-  toHtmlWith
-    { defaultOptions | githubFlavored = Just { tables = True, breaks = False } }
-    []
-    s
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
