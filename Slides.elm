@@ -21,7 +21,6 @@ rparse slides acc =
     _ :: [] -> push (toHtml slides) acc
     _ :: next :: _ ->
       let
-        _ = Debug.log "next = " next
         slide = left next slides |> toHtml
         remaining = dropLeft next slides
       in

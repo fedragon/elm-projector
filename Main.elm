@@ -1,7 +1,6 @@
 import Array exposing (Array, fromList, map)
 import Css
 import Html exposing (Html, button, div, text)
-import Html.App as App
 import Html.Attributes exposing (class, disabled, style)
 import Html.Events exposing (onClick)
 import Http exposing (getString)
@@ -13,7 +12,7 @@ import Window
 import Slides
 
 main =
-  App.program {
+  Html.program {
     init = init,
     update = update,
     subscriptions = subscriptions,
@@ -31,22 +30,23 @@ type Msg =
   | GotSlides (Array(Html Msg))
   | PreviousSlide
   | NextSlide
-  | Idle
   | Resize Window.Size
 
 init : (Model, Cmd Msg)
 init =
   (Model (Window.Size 0 0) Array.empty 0,
-    Task.perform (\_ -> Idle) (\x -> Resize x) Window.size)
+    Task.perform (\x -> Resize x) Window.size)
 
 getSlides : Cmd Msg
 getSlides =
-  Task.perform
-    (\_ -> SlidesNotFound)
-    (\s -> GotSlides s)
-    (Task.map
-      (\slides -> Slides.parse slides)
-      (Http.getString "/slides.md"))
+  (Http.send
+    (\r ->
+      case r of
+        Result.Err _ ->
+          SlidesNotFound
+        Result.Ok s ->
+          GotSlides <| Slides.parse s)
+    (Http.getString "/slides.md"))
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
@@ -61,8 +61,6 @@ update msg model =
       ({ model | index = model.index + 1 }, Cmd.none)
     Resize newSize ->
       ({ model | windowSize = newSize }, getSlides)
-    Idle ->
-      (model, getSlides)
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
