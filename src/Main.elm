@@ -11,6 +11,7 @@ import Window
 
 import Slides
 
+main : Program Never Model Msg
 main =
   Html.program {
     init = init,
@@ -66,6 +67,7 @@ subscriptions : Model -> Sub Msg
 subscriptions model =
   Window.resizes Resize
 
+renderButtons : Model -> Html Msg
 renderButtons model =
   div
     [ class "buttons" ]

@@ -6,8 +6,13 @@ Present Markdown slides as HTML. Built in [Elm](http://elm-lang.org). Heavily in
 
 Slides are expected to be defined in `slides.md`: each slide must start with a **Heading 1** (e.g. `# First slide`).
 
+## Initial setup
+
+    brew install node yarn
+    yarn add webpack webpack-dev-server elm-webpack-loader file-loader style-loader css-loader
+
 ## Run
 
-    elm-reactor
+    yarn start
 
-then go to [http://localhost:8000/Main.elm](http://localhost:8000/Main.elm)
+then go to [http://localhost:3000](http://localhost:3000)
