@@ -4,7 +4,7 @@ Present Markdown slides as HTML. Built in [Elm](http://elm-lang.org). Heavily in
 
 ## Add your slides
 
-Slides are expected to be defined in `slides.md`: each slide must start with a **Heading 1** (e.g. `# First slide`).
+Write your slides in `slides.md`. Every **Heading 1** (e.g. `# First slide`) found in the file will be considered the beginning of new slide.
 
 ## Initial setup
 
