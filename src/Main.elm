@@ -132,8 +132,6 @@ view model =
     div
         [ class "container-fluid"
         , style [ ( "height", "100%" ) ]
-
-        --, style [ ( "width", width ), ( "height", height ) ]
         ]
         [ Css.style [ Html.Attributes.scoped True ] stylesheet
         , renderSlide model
