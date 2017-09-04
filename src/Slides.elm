@@ -3,6 +3,7 @@ module Slides exposing (parse)
 import Array exposing (Array, empty, push)
 import Html exposing (Html)
 import Markdown exposing (defaultOptions, toHtmlWith)
+import Regex exposing (HowMany(All), regex, split)
 import String exposing (dropLeft, indexes, left)
 
 
@@ -15,28 +16,6 @@ toHtml s =
         }
         []
         s
-
-
-rparse : String -> Array (Html msg) -> Array (Html msg)
-rparse slides acc =
-    case indexes "# " slides of
-        [] ->
-            push (toHtml slides) acc
-
-        _ :: [] ->
-            push (toHtml slides) acc
-
-        _ :: next :: _ ->
-            let
-                slide =
-                    left next slides |> toHtml
-
-                remaining =
-                    dropLeft next slides
-            in
-            rparse
-                remaining
-                (push slide acc)
 
 
 dropLeadingHtmlTags : Int -> String -> String
@@ -55,6 +34,8 @@ parse raw =
                 slides =
                     dropLeadingHtmlTags hd raw
             in
-            rparse
-                slides
-                empty
+                split All (regex "(?:^|\n\n)#\\s") slides
+                    |> List.filter (not << String.isEmpty)
+                    |> List.map ((++) "# ")
+                    |> List.map toHtml
+                    |> Array.fromList

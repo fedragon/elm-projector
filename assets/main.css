@@ -10,8 +10,9 @@ body, html, #main {
 
 .slide {
   font-size: 1.4em;
-  height: 90%;
   color: white;
+  height: 90%;
+  margin-right: 1px;
 }
 
 .slide > .top {

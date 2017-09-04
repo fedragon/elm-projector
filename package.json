@@ -4,12 +4,12 @@
   "homepage": "https://github.com/fedragon/elm-projector",
   "license": "MIT",
   "dependencies": {
-    "css-loader": "^0.28.4",
+    "css-loader": "^0.28.7",
     "elm-webpack-loader": "^4.3.1",
     "file-loader": "^0.11.2",
     "style-loader": "^0.18.2",
-    "webpack": "^3.0.0",
-    "webpack-dev-server": "^2.5.0"
+    "webpack": "^3.5.5",
+    "webpack-dev-server": "^2.7.1"
   },
   "scripts": {
     "build": "webpack",

@@ -9,8 +9,6 @@ import Http exposing (getString)
 import Markdown
 import Maybe exposing (Maybe, withDefault)
 import Slides
-import Task
-import Window
 
 
 main : Program Never Model Msg
@@ -129,11 +127,11 @@ view model =
         stylesheet =
             Css.stylesheet imports []
     in
-    div
-        [ class "container-fluid"
-        , style [ ( "height", "100%" ) ]
-        ]
-        [ Css.style [ Html.Attributes.scoped True ] stylesheet
-        , renderSlide model
-        , renderControls model
-        ]
+        div
+            [ class "container-fluid"
+            , style [ ( "height", "100%" ) ]
+            ]
+            [ Css.style [ Html.Attributes.scoped True ] stylesheet
+            , renderSlide model
+            , renderControls model
+            ]
